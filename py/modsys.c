@@ -102,6 +102,10 @@ STATIC mp_obj_t mp_sys_exit(size_t n_args, const mp_obj_t *args) {
 }
 MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(mp_sys_exit_obj, 0, 1, mp_sys_exit);
 
+#ifdef MP_DEV_VERSION		// fms
+STATIC const MP_DEFINE_STR_OBJ(dev_version_obj, MP_DEV_VERSION); // fm
+#endif		// fms
+
 STATIC mp_obj_t mp_sys_print_exception(size_t n_args, const mp_obj_t *args) {
     #if MICROPY_PY_IO && MICROPY_PY_SYS_STDFILES
     void *stream_obj = &mp_sys_stdout_obj;
@@ -164,6 +168,9 @@ STATIC const mp_rom_map_elem_t mp_module_sys_globals_table[] = {
     #else
     { MP_ROM_QSTR(MP_QSTR_byteorder), MP_ROM_QSTR(MP_QSTR_big) },
     #endif
+    #ifdef MP_DEV_VERSION 		// fms
+    { MP_ROM_QSTR(MP_QSTR_devversion), MP_ROM_PTR(&dev_version_obj) }, 	// fms
+    #endif			// fms
 
     #if MICROPY_PY_SYS_MAXSIZE
     #if MICROPY_LONGINT_IMPL == MICROPY_LONGINT_IMPL_NONE

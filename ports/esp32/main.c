@@ -73,6 +73,8 @@ void mp_task(void *pvParameter) {
     size_t mp_task_heap_size = heap_caps_get_largest_free_block(MALLOC_CAP_8BIT);
     void *mp_task_heap = malloc(mp_task_heap_size);
 
+	memset(mp_task_heap, 0, mp_task_heap_size);			// fms
+
 soft_reset:
     // initialise the stack pointer for the main thread
     mp_stack_set_top((void *)sp);
