@@ -1,0 +1,58 @@
+#!/bin/bash  -x
+
+. ~/src/scripts/profile.tools
+
+. ~/src/scripts/ttyport.tools
+
+shorthost="${orighost%%.*}"
+
+if ! [[ -z "$shorthost" ]] ; then
+    orighost="$shorthost"
+fi
+
+echo >&2 "orighost is $orighost"
+
+AMPY=ampy
+MPYCROSS="$p_git/micropython/upy-fork-1.9.4/mpy-cross/mpy-cross"
+
+case "$OS" in
+    Mac)
+        #
+        # Note that I had to put a time.sleep(0.5) in 
+        #   module: /Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/ampy/pyboard.py
+        #   function: enter_raw_repl(self) 
+        #   location: immediately after ctl-c write
+        #
+        # In order to flush out all unexpected output produced by my esp8266 immediately after a reset
+        # so that serial reads after issuing Ctl-A are associated with the Ctl-A and not data already
+        # in the serial receive buffer
+        #
+        ESPTOOL="python /Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/esptool.py"
+
+        case $orighost in
+            fms-imac-e|fmsimac|Faisal-Shahs-iMac.local|Faisal-Shahs-iMac)
+                AMPY=ampy
+				ESPTOOL="esptool.py"
+            ;;
+            Faisals-MacBook-Air|Faisals-MacBook-Air.local|fmsair-w|fmsair|fmsair_w)
+                AMPY="/Library/Frameworks/Python.framework/Versions/2.7/bin/ampy"
+            ;;
+            *)
+                MPYCROSS=mpy-cross
+            ;;
+        esac
+    ;;
+    Ubuntu)
+        AMPY="/usr/local/bin/ampy"
+		ESPTOOL="/usr/local/bin/esptool.py"
+    ;;
+    *)
+
+esac
+
+echo >&2 "ampy is $AMPY"
+
+SDPATH=""
+
+MODPATH="$HOME/src/micropython/esp32/modules/libfms"
+MPYLIBS="$p_git/micropython/micropython-lib"
